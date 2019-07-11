@@ -21,10 +21,10 @@ def passafaixa(h1, Fs2):
     # Filtro Passa-Faixa
     gpass= 3 # Ripple na banda de passagem
     gstop= 82 # Atenuação na banda de rejeição
-    fs1=9000 # Frequências de rejeição
+    fs1= 9000 # Frequências de rejeição
     fp1= 11000# Frequências de corte
-    fp2=13000
-    fs2=14000
+    fp2= 13000
+    fs2= 14000
     fn = Fs2/2 # Frequência de Nyquist
     Wp1=fp1/fn  # Frequências normalizada
     Wp2=fp2/fn  
@@ -86,7 +86,7 @@ file_path1 = filedialog.askopenfilename()
 (freq,sig) = wav.read(file_path1)
 Fs = freq
 audlength1 = len(sig)/freq
-Fc1 = 10000 #Frequência do Carrier
+Fc1 = 100 #Frequência do Carrier
 Ac = 1 #Amplitude do Carrier
 
 
@@ -103,7 +103,10 @@ plt.show()
 """
 decSig = decimate(sig, factor)
 modulatedSig = modula(carrier, decSig)
+print(Fs)
+print(factor)
 wav.write("modulated1.wav", Fs, modulatedSig)
+wav.write("carrier1.wav", Fs, carrier)
 plotting(decSig, modulatedSig, n1) #Plota o primeiro sinal e a sua versão modulada
 
 print("==Segundo arquivo==")
@@ -112,7 +115,7 @@ file_path2 = filedialog.askopenfilename()
 Fs = freq
 audlength2 = len(sig2)/freq
 n2 = np.arange(0, audlength2/factor, 1/Fs)
-Fc2 = 5000 # Frequência do segundo carrier, que será descartado
+Fc2 = 200 # Frequência do segundo carrier, que será descartado
 
 mult = np.cos(2*np.pi*Fc2*n2 + np.pi/2)
 carrier = (Ac * mult)
@@ -125,7 +128,10 @@ plt.show()
 
 decSig2 = decimate(sig2, factor)
 modulatedSig2 = modula(carrier, decSig2)
+print(Fs)
+print(factor)
 wav.write("modulated2.wav", Fs, modulatedSig2)
+wav.write("carrier2.wav", Fs, carrier)
 
 plotting(decSig2, modulatedSig2, n2)
 
@@ -145,6 +151,8 @@ mult = np.cos(2*np.pi*Fc1*n2 + np.pi/2)
 carrier = (Ac * mult)
 wav.write("audiosomado.wav", Fs, modulatedSig)
 
+passSig = passafaixa(modulatedSig, Fs)
+
 demodulatedSig = demodula(modulatedSig, carrier) #Retira o Carrier 1
 plt.plot(n1, demodulatedSig)
 plt.title('Sinal demodulado')
@@ -152,10 +160,11 @@ plt.xlabel('n')
 plt.ylabel('Amplitude')
 plt.show()
 
-passSig = passafaixa(demodulatedSig, Fs)
+
+plotting(modulatedSig, demodulatedSig, np.arange(0, (len(passSig)/Fs), 1/Fs))
 
 #Upsampling do sinal
-passSig = resample(passSig, len(sig))
+passSig = resample(demodulatedSig, len(sig))
 
 input("Aperte enter para continuar.")
 plotting(sig, passSig, np.arange(0, len(sig)/Fs, 1/Fs))
