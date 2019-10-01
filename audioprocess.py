@@ -1,4 +1,4 @@
-import scipy.io.wavfile as wav
+﻿import scipy.io.wavfile as wav
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -28,7 +28,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     y = lfilter(b, a, data)
     return y
 
-def modula(carrier, sig):
+def modula(carrier, sig): //multiplica a operadora com o sinal para convoluir, ou seja, modula
     mod = carrier * sig
     return mod
 
@@ -40,7 +40,7 @@ def demodula(sig, carrier):
 root = tk.Tk()
 file_path1 = filedialog.askopenfilename()
 
-(freq,sig) = wav.read(file_path1)
+(freq,sig) = wav.read(file_path1) #lê o arquivo de audio
 Fs = freq
 audlength1 = len(sig)/freq
 Fc1 = 100000 #Frequência do Carrier
@@ -51,8 +51,8 @@ factor = int(input("Escreva o fator de dizimação:"))
 n = np.arange(0, audlength1/factor, 1/Fs)
 mult = np.cos(2*np.pi*Fc1*n)
 
-carrier = (Ac * mult)
-"""Gráfico do sinal Carrier
+carrier = (Ac * mult) #gera o gráfico
+"""Gráfico do sinal Carrier 
 plt.title('Sinal Portador')
 plt.plot(n, carrier)
 plt.grid()
@@ -111,7 +111,7 @@ passSig = butter_bandpass_filter(modulatedSig, 2500.0, 3000.0, 8000)
 
 demodulatedSig = demodula(passSig, carrier) #Retira o Carrier 1
 plt.plot(n, demodulatedSig)
-plt.title('Sinal demodulado')
+plt.title('Sinal demodulado com sucesso')
 plt.xlabel('n')
 plt.ylabel('Amplitude')
 plt.show()
@@ -122,7 +122,7 @@ plotting(modulatedSig, demodulatedSig, np.arange(0, (len(passSig)/Fs), 1/Fs))
 #Upsampling do sinal
 passSig = resample(demodulatedSig, len(sig))
 
-input("Aperte enter para continuar.")
+input("Pressione enter para continuar.")
 plotting(sig, passSig, np.arange(0, len(sig)/Fs, 1/Fs))
 
 print(metrics.mean_squared_error(sig, passSig))
